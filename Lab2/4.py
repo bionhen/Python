@@ -3,17 +3,24 @@ import numpy as np
 from random import *
 t.shape('circle')
 t.speed(100)
-x = 0
+x = -300
 y = 0
 dt = 0.1
-Vx = 10
-Vy = 20
-ay = -10
+Vx = 40
+Vy = 50
 i = 0
+t.penup()
+t.goto(-300, 0)
+t.pendown()
 while i < 1000:
+ if Vy > 0:
+    ay = -10 - 0.05*Vy
+ else: ay = -10 - 0.05*Vy
  x += Vx*dt
  y += Vy*dt + ay*dt**2/2
  Vy += ay*dt
+ ax = -0.05*Vx
+ Vx += ax*dt
  i = i + 1
  if y < 0:
   Vy = -Vy
