@@ -17,7 +17,7 @@ while i < 1000:
     ay = -10 - 0.05*Vy
  else: ay = -10 - 0.05*Vy
  x += Vx*dt
- y += Vy*dt + ay*dt**2/2
+ y += Vy*dt 
  Vy += ay*dt
  ax = -0.05*Vx
  Vx += ax*dt
