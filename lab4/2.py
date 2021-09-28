@@ -2,22 +2,19 @@ import pygame
 from pygame.draw import *
 
 pygame.init()
-
+color=(255, 255, 255)
 FPS = 30
 screen = pygame.display.set_mode((1500, 800))
-
+screen.fill(color)
 x1 = 100; y1 = 100
 x2 = 300; y2 = 200
 N = 10
-color = (100, 20, 100)
-circle(screen, color, (700, 400), 100)
-circle(screen, color, (700, 400), 100)
-h = (x2 - x1) // (N + 1)
-x = x1 + h
-for i in range(N):
-    line(screen, color, (x, y1), (x, y2))
-    x += h
-
+circle(screen, (255, 255, 0), (700, 400), 100)
+circle(screen, (225, 0, 0), (650, 360), 20)
+circle(screen, (225, 0, 0), (750, 360), 15)
+circle(screen, (1, 1, 1), (650, 360), 10)
+circle(screen, (1, 1, 1), (750, 360), 7)
+rect(screen, (1, 1, 1), (650, 420, 100, 20))
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
