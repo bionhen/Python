@@ -35,12 +35,22 @@ def car1(a, x, y):
     ellipse(screen, (1, 1, 1), (x + 160 * a, y + 65 * abs(a), 40 * abs(a), 30 * abs(a)))
 
 
-rect(screen, (51, 51, 51), (-200, 400, 1500, 800))
+i = 0
+m = 51
+n = 51
+k = 400
+while i<200:
+    m += 1
+    n += 1
+    k += 4
+    rect(screen, (51, m, n), (-200, k, 1500, 800))
+    i += 1
+rect(screen, (50, 50, 50), (0, 0, 800, 120))
 rect(screen, (204, 204, 204), (500, 20, 150, 500))
-rect(screen, (102, 153, 102), (600, 70, 150, 500))
-rect(screen, (102, 102, 102), (10, 0, 150, 500))
-rect(screen, (153, 153, 102), (200, 0, 150, 500))
-rect(screen, (153, 204, 204), (100, 50, 150, 500))
+rect(screen, (102, 102, 102), (310, 70, 120, 400))    #smallcenter
+rect(screen, (102, 102, 102), (450, 150, 120, 400))    #smallcenter
+rect(screen, (153, 204, 204), (10, 100, 120, 400))      #smallrl
+rect(screen, (153, 204, 204), (670, 90, 120, 400))  # smallrl
 car(1.0, 270, 600)
 car1(-1.5, 690, 660)
 car(0.7, 530, 570)
@@ -51,10 +61,31 @@ circle = pygame.Surface((800*2, 800*2), pygame.SRCALPHA)
 ellipse(circle, (102, 153, 153, 128), (200, 150, 400, 100))
 ellipse(circle, (102, 153, 153, 128), (100, -10, 500, 120))
 ellipse(circle, (102, 153, 153, 128), (600, -20, 500, 120))
+ellipse(circle, (200, 200, 200, 128), (20, 20, 100, 30))
+ellipse(circle, (100, 100, 100, 128), (240, 40, 150, 30))
+ellipse(circle, (150, 150, 150, 128), (640, 30, 120, 40))
+rect(circle, (220, 220, 220, 128), (20, 150, 300, 300))
+rect(circle, (220, 220, 220, 128), (500, 120, 300, 300))
+ellipse(circle, (10, 10, 10, 128), (100, 30, 120, 40))
+ellipse(circle, (10, 10, 10, 128), (630, 50, 150, 60))
+ellipse(circle, (10, 10, 10, 128), (430, 40, 300, 70))
+i = 0
+m = 200
+n = 200
+k = 200
+r = 100
+l = 500
+z = 600
+while i < 20:
+    m += 1
+    n += 1
+    k += 1
+    r -= 5
+    l -= 1
+    z -= 1
+    i += 1
+    ellipse(circle, (m, n, k, 128), (l, z, r, r))
 screen.blit(circle, (0, 0))
-
-
-
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
