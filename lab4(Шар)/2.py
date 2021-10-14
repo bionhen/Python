@@ -16,7 +16,7 @@ BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 score = 0
 balls = []
-for i in range(randint(3, 10)):
+for i in range(randint(6, 12)):
     x = randint(100, 700)
     y = randint(100, 500)
     r = randint(30, 50)
@@ -59,7 +59,7 @@ while not finished:
                  balls.pop(i)
                  x = randint(100, 700)
                  y = randint(100, 500)
-                 r = randint(30, 50)
+                 r = randint(30, 50)*2**(-0.005*score)
                  color = COLORS[randint(0, 5)]
                  balls.append([color, x, y, r])
             print('score:', score)
@@ -67,12 +67,12 @@ while not finished:
     for i in range(l):
       color, x, y, r = balls[i]
       new_ball(color, x, y, r)
-    for i in range(l):
+    for i in range(l):  
        balls[i][1] += v[i][0]
        balls[i][2] += v[i][1]
-       if balls[i][1] < 0 or balls[i][1] > 1200:
+       if balls[i][1] - balls[i][3] < 0 or balls[i][1] + balls[i][3] > 1200:
           v[i][0] = -v[i][0]
-       if balls[i][2] < 0 or balls[i][2] > 900:
+       if balls[i][2] - balls[i][3] < 0 or balls[i][2] + balls[i][3]> 900:
           v[i][1] = -v[i][1]
     pygame.display.update()
     screen.fill(BLACK)
