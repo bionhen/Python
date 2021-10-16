@@ -57,11 +57,15 @@ while not finished:
               if (balls[i][1]-w)**2+(balls[i][2]-z)**2 < balls[i][3]**2:
                  score += 1
                  balls.pop(i)
+                 v.pop(i)
                  x = randint(100, 700)
                  y = randint(100, 500)
                  r = randint(30, 50)*2**(-0.005*score)
                  color = COLORS[randint(0, 5)]
                  balls.append([color, x, y, r])
+                 vx = randint(-5, 5)
+                 vy = randint(-5, 5)
+                 v.append([vx, vy])
             print('score:', score)
 
     for i in range(l):
@@ -70,6 +74,8 @@ while not finished:
     for i in range(l):  
        balls[i][1] += v[i][0]
        balls[i][2] += v[i][1]
+       v[i][0] += (score*(-1)/100) ** randint(1, 5)
+       v[i][1] += (score * (-1)/100) ** randint(1, 5)
        if balls[i][1] - balls[i][3] < 0 or balls[i][1] + balls[i][3] > 1200:
           v[i][0] = -v[i][0]
        if balls[i][2] - balls[i][3] < 0 or balls[i][2] + balls[i][3]> 900:
