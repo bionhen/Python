@@ -16,6 +16,12 @@ BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 score = 0
 balls = []
+
+
+# Задает кортеж кортежей, с случайными параметрами
+# color - цвет i-го шарика
+# x - координата i-го шарика
+# y - координата i-го шарика
 for i in range(randint(6, 12)):
     x = randint(100, 700)
     y = randint(100, 500)
@@ -23,13 +29,18 @@ for i in range(randint(6, 12)):
     color = COLORS[randint(0, 5)]
     balls.append([color, x, y, r])
 l = len(balls)
-v=[]
+
+
+# задает кортеж кортежей из двух значений
+# vx - скорость по x
+# vy - скорость по y
+v = []
 for i in range(l):
     vx = randint(-5, 5)
     vy = randint(-5, 5)
     v.append([vx, vy])
 
-
+# функция, рисующая шарик цветом color, с центром в точке x, y, с радиусом r
 def new_ball(color, x, y, r):
     circle(screen, color, (x, y), r)
 
@@ -46,6 +57,12 @@ clock = pygame.time.Clock()
 finished = False
 
 while not finished:
+
+    f1 = pygame.font.Font(None, 50)
+    text1 = f1.render(str(score), True, (180, 0, 0))
+    text2 = f1.render('score:', True, (180, 0, 0))
+    screen.blit(text1, (120, 50))
+    screen.blit(text2, (10, 50))
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -60,11 +77,11 @@ while not finished:
                  v.pop(i)
                  x = randint(100, 700)
                  y = randint(100, 500)
-                 r = randint(30, 50)*2**(-0.005*score)
+                 r = randint(30, 50)*2**(0.005*score)
                  color = COLORS[randint(0, 5)]
                  balls.append([color, x, y, r])
-                 vx = randint(-5, 5)
-                 vy = randint(-5, 5)
+                 vx = randint(-5-score, 5+score)
+                 vy = randint(-5-score, 5+score)
                  v.append([vx, vy])
             print('score:', score)
 
@@ -74,8 +91,6 @@ while not finished:
     for i in range(l):  
        balls[i][1] += v[i][0]
        balls[i][2] += v[i][1]
-       v[i][0] += (score*(-1)/100) ** randint(1, 5)
-       v[i][1] += (score * (-1)/100) ** randint(1, 5)
        if balls[i][1] - balls[i][3] < 0 or balls[i][1] + balls[i][3] > 1200:
           v[i][0] = -v[i][0]
        if balls[i][2] - balls[i][3] < 0 or balls[i][2] + balls[i][3]> 900:
