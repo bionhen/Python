@@ -64,6 +64,7 @@ def new_ball(color, x, y, r):
 l = len(balls)
 
 
+
 def click(event):
     print(x, y, r)
 
