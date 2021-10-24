@@ -15,49 +15,57 @@ CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 score = 0
+
+
 class Ball:
-    def __init__(self, x, y, Vx, Vy, r, COLOR, wallx, wally, cball):
+    def __init__(self, x, y, vx, vy, r, COLOR, count):
      self.x = x
      self.y = y
      self.r = r
+     self.count = count
+     self.vx = vx
+     self.vy = vy
+     self.COLOR = COLOR
 
     def move(self):
-       self.x += self.Vx
-       self.y += self.Vy
+       self.x += self.vx
+       self.y += self.vy
 
-    def collision_wal(self):
+    def collision_wall(self):
 
       if self.x < 0+self.r or self.x > 1200-self.r:
-        self.Vy = -self.Vy
+        self.vx = -self.vx
       if self.y < 0+self.r or self.y > 900 -self.r:
-        self.Vy = -self.Vy
+        self.vy = -self.vy
 
     def collision_ball(self):
-      if self.cball > 0:
-         self.Vx = -self.Vx
-         self.Vy = -self.Vy
+      if self.count > 0:
+         self.vx = -self.vx
+         self.vy = -self.vy
+
+
 balls = []
-for i in range(randint(6, 12)):
+for i in range(randint(3, 5)):
     x = randint(100, 700)
     y = randint(100, 500)
     r = randint(30, 50)
-    Vx = randint(-10, 10)
-    Vy = randint(-10, 10)
+    vx = randint(-10, 10)
+    vy = randint(-10, 10)
     COLOR = COLORS[randint(0, 5)]
-    wallx = 0
-    wally = 0
-    cball = 0
-    my_ball = Ball(x, y, Vx, Vy, r, COLOR, wallx, wally, cbal)
+    count = 0
+    my_ball = Ball(x, y, vx, vy, r, COLOR, count)
     balls.append(my_ball)
+
+
 def new_ball(color, x, y, r):
     circle(screen, color, (x, y), r)
+
 
 l = len(balls)
 
 
 def click(event):
     print(x, y, r)
-
 
 
 pygame.display.update()
@@ -79,19 +87,37 @@ while not finished:
             w, z = event.pos
             print(w, z)
             for i in range(l):
-              if
+               if (balls[i].x-w)**2 + (balls[i].y-z)**2 < balls[i].r**2:
+                score += 1
+                balls.pop(i)
+                x = randint(100, 700)
+                y = randint(100, 500)
+                r = randint(30, 50)
+                vx = randint(-10, 10)
+                vy = randint(-10, 10)
+                COLOR = COLORS[randint(0, 5)]
+                count = 0
+                my_ball = Ball(x, y, vx, vy, r, COLOR, count)
+                balls.append(my_ball)
             print('score:', score)
-
+    for i in range(0, l, 1):
+        for j in range(i+1, l, 1):
+            if (balls[j].x-balls[i].x)**2+(balls[j].y-balls[i].y)**2 < (balls[j].r+balls[i].r)**2:
+                balls[j].count += 1
+                balls[i].count += 1
+        Ball.collision_ball(balls[i])
     for i in range(l):
-      color, x, y, r = balls[i]
+        Ball.move(balls[i])
+    for i in range(l):
+      color = balls[i].COLOR
+      x = balls[i].x
+      y = balls[i].y
+      r = balls[i].r
       new_ball(color, x, y, r)
     for i in range(l):
-       balls[i][1] += v[i][0]
-       balls[i][2] += v[i][1]
-       if balls[i][1] - balls[i][3] < 0 or balls[i][1] + balls[i][3] > 1200:
-          v[i][0] = -v[i][0]
-       if balls[i][2] - balls[i][3] < 0 or balls[i][2] + balls[i][3]> 900:
-          v[i][1] = -v[i][1]
+        Ball.collision_wall(balls[i])
+    for i in range(0, l, 1):
+        balls[i].count = 0
     pygame.display.update()
     screen.fill(BLACK)
 
