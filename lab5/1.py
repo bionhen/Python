@@ -1,8 +1,8 @@
 import math
-from random import choice
+from random import randint
 
 import pygame
-
+pygame.init()
 
 FPS = 30
 
@@ -13,6 +13,7 @@ GREEN = (0, 255, 0)
 MAGENTA = (255, 0, 255)
 CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
+WHITE = (0, 0, 0)
 score = 0
 GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
@@ -21,7 +22,7 @@ HEIGHT = 600
 
 
 class Ball:
-    def __init__(self, screen: pygame.Surface, x=40, y=450):
+    def __init__(self, screen: pygame.Surface, x, y, r, vx, vy, color):
         """ Конструктор класса ball
 
         Args:
@@ -32,11 +33,11 @@ class Ball:
         self.screen = screen
         self.x = x
         self.y = y
-        self.r = 10
-        self.vx = 0
+        self.r = r
+        self.vx = vx
         self.g = 10
-        self.vy = 0
-        self.color = choice(GAME_COLORS)
+        self.vy = vy
+        self.color = color
         self.live = 30
 
     def move(self):
@@ -46,7 +47,7 @@ class Ball:
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-        self.vy += g/30
+        self.vy += self.g/30
         self.x += self.vx
         self.y -= self.vy
         if self.x - self.r < 0 or self.x +self.r > 800:
@@ -74,13 +75,14 @@ class Ball:
         else:
             return False
 
+
 class Gun:
     def __init__(self, screen):
         self.screen = screen
         self.f2_power = 10
         self.f2_on = 0
         self.an = 1
-        self.color = GREY
+        self.color = GREEN
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -109,10 +111,13 @@ class Gun:
         if self.f2_on:
             self.color = RED
         else:
-            self.color = GREY
+            self.color = GREEN
 
-    def draw(self):
-        # FIXIT don't know how to do it
+    def draw(self, event):
+        pygame.draw.rect(
+            self.screen,
+            BLACK,
+            (0, 500), 100, 20)
 
     def power_up(self):
         if self.f2_on:
@@ -120,35 +125,52 @@ class Gun:
                 self.f2_power += 1
             self.color = RED
         else:
-            self.color = GREY
+            self.color = GREEN
 
 
-class Target:
-    # self.points = 0
-    # self.live = 1
-    # FIXME: don't work!!! How to call this functions when object is created?
-    # self.new_target()
+class Target(Ball):
+    def __init__(self, screen: pygame.Surface, x, y, r, vx, vy, color, points):
+     super().__init__(screen, x, y, r, vx, vy, color)
 
-    def new_target(self):
-        """ Инициализация новой цели. """
-        x = self.x = rnd(600, 780)
-        y = self.y = rnd(300, 550)
-        r = self.r = rnd(2, 50)
-        color = self.color = RED
 
-    def hit(self, points=1):
-        """Попадание шарика в цель."""
-        self.points += points
+
+    def hittest(self, obj):
+        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
+        Args:
+           obj: Обьект, с которым проверяется столкновение.
+        Returns:
+        Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
+        """
+        if (obj.x - self.x) ** 2 + (obj.y - self.y) ** 2 <= (self.r + obj.r) ** 2:
+           return True
+        else:
+           return False
+    #def hit(self, points):
+        #"""Попадание шарика в цель."""
+        #self.points += points
 
     def draw(self):
-        ...
+            pygame.draw.circle(
+                self.screen,
+                self.color,
+                (self.x, self.y),
+                self.r
+            )
+#class Bullet(Ball):
 
 
-pygame.init()
+Targets=[]
+for i in range(randint(3,6)):
+    x = randint(100, 700)
+    y = randint(100, 500)
+    r = randint(30, 50)
+    vx = randint(-10, 10)
+    vy = randint(-10, 10)
+    COLOR = GAME_COLORS[randint(0, 5)]
+
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 bullet = 0
-balls = []
-
 clock = pygame.time.Clock()
 gun = Gun(screen)
 target = Target()

@@ -22,6 +22,7 @@ score = 0
  столкновения с другим шариком collision_ball
 """
 
+
 class Ball:
     def __init__(self, x, y, vx, vy, vx1, vy1, r, COLOR, count):
      self.x = x
@@ -50,6 +51,35 @@ class Ball:
          self.vx = self.vx1
          self.vy = self.vy1
 
+
+class Rect:
+    def __init__(self, x, y, vx, vy, ax, ay, a, b, COLOR):
+     self.x = x
+     self.y = y
+     self.a = a
+     self.b = b
+     self.vx = vx
+     self.vy = vy
+     self.COLOR = COLOR
+     self.ax = ax
+     self.ay = ay
+
+    def move(self):
+       self.x += self.vx
+       self.y += self.vy
+       self.vx += self.ax
+       self.vy += self.ay
+
+
+    def collision_wall(self):
+
+      if self.x < 0 or self.x > 1200-self.a:
+        self.vx = -self.vx
+      if self.y < 0 or self.y > 900 -self.b:
+        self.vy = -self.vy
+
+
+
 """ 
 Создает кортеж balls из элементов Ball с рандомной длиной
 """
@@ -67,11 +97,30 @@ for i in range(randint(6, 12)):
     balls.append(my_ball)
 
 
+rects = []
+for i in range(randint(6, 12)):
+    x = randint(100+100*i, 200+100*i)
+    y = randint(100, 500)
+    a = randint(20, 40)
+    b = randint(10, 25)
+    vx = randint(-10, 10)
+    vy = randint(-10, 10)
+    ax = randint(-1, 1)
+    ay = randint(-1, 1)
+    COLOR = COLORS[randint(0, 5)]
+    my_rect = Rect(x, y, vx, vy, ax, ay, a, b, COLOR)
+    rects.append(my_rect)
+
+
 def new_ball(color, x, y, r):
     circle(screen, color, (x, y), r)
 
 
+def new_rect(color, x, y, a, b):
+    rect(screen, color, (x, y, a, b))
+
 l = len(balls)
+s = len(rects)
 
 
 def click(event):
@@ -109,7 +158,21 @@ while not finished:
                 count = 0
                 my_ball = Ball(x, y, vx, vy, 0, 0, r, COLOR, count)
                 balls.append(my_ball)
-
+            for i in range(s):
+                if w - rects[i].x > 0 and w - rects[i].x < rects[i].a and z - rects[i].y > 0 and z - rects[i].y < rects[i].b:
+                   rects.pop(i)
+                   x = randint(100 + 100 * i, 200 + 100 * i)
+                   y = randint(100, 500)
+                   a = randint(20, 40)
+                   b = randint(10, 25)
+                   vx = randint(-10, 10)
+                   vy = randint(-10, 10)
+                   ax = randint(-1, 1)
+                   ay = randint(-1, 1)
+                   COLOR = COLORS[randint(0, 5)]
+                   my_rect = Rect(x, y, vx, vy, ax, ay, a, b, COLOR)
+                   rects.append(my_rect)
+                   score += 1
             print('score:', score)
     for i in range(0, l, 1):
         for j in range(i+1, l, 1):
@@ -140,6 +203,16 @@ while not finished:
 
     for i in range(l):
         Ball.move(balls[i])
+    for i in range(s):
+        Rect.move(rects[i])
+    for i in range(s):
+        color = rects[i].COLOR
+        x = rects[i].x
+        y = rects[i].y
+        a = rects[i].a
+        b = rects[i].b
+        new_rect(color, x, y, a, b)
+
     for i in range(l):
       color = balls[i].COLOR
       x = balls[i].x
@@ -148,6 +221,8 @@ while not finished:
       new_ball(color, x, y, r)
     for i in range(l):
         Ball.collision_wall(balls[i])
+    for i in range(s):
+        Rect.collision_wall(rects[i])
     for i in range(0, l, 1):
         balls[i].count = 0
         balls[i].vx1 = 0
