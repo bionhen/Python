@@ -16,11 +16,11 @@ BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 score = 0
 
-# Задает класс Ball с методами:
-# движения move
-# столкновения со стеной collision_wall
-# столкновения с другим шариком collision_ball
-
+""" Задает класс Ball с методами:
+ движения move
+ столкновения со стеной collision_wall
+ столкновения с другим шариком collision_ball
+"""
 
 class Ball:
     def __init__(self, x, y, vx, vy, vx1, vy1, r, COLOR, count):
@@ -50,8 +50,9 @@ class Ball:
          self.vx = self.vx1
          self.vy = self.vy1
 
-# Создает кортеж balls из элементов Ball с рандомной длиной
-
+""" 
+Создает кортеж balls из элементов Ball с рандомной длиной
+"""
 
 balls = []
 for i in range(randint(6, 12)):
