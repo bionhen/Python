@@ -79,13 +79,15 @@ class Ball:
 
 
 class Gun:
-    def __init__(self, screen, surface):
+    def __init__(self, screen, surface, x1, y1):
         self.screen = screen
         self.surface = surf
         self.f2_power = 10
         self.f2_on = 0
         self.an = 1
         self.color = GREEN
+        self.x1 = x1
+        self.y1 = y1
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -113,9 +115,9 @@ class Gun:
         else:
             self.color = GREEN
 
-    def draw(self, screen, surface, event):
+    def draw(self, screen, surface, x1, y1):
         self.screen = screen
-        self.an = math.atan((event.pos[1] - 400) / (event.pos[0] - 20))
+        self.an = math.atan((y1 - 400) / (x1 - 20))
         self.surface = surface
         pygame.draw.rect(
             self.surface,
@@ -196,11 +198,13 @@ for i in range(randint(3, 6)):
 l = len(Targets)
 bullet = 0
 clock = pygame.time.Clock()
-gun = Gun(screen, surf)
+gun = Gun(screen, surf, 0, 0)
 finished = False
 
 while not finished:
     screen.fill(WHITE)
+    x1, y1 = pygame.mouse.get_pos()
+    gun.draw(screen, surf, x1, y1)
     for i in range(l):
         Ball.draw(Targets[i])
         Ball.move(Targets[i])
@@ -209,7 +213,6 @@ while not finished:
             finished = True
         elif event.type == pygame.MOUSEMOTION:
             gun.targetting(event)
-            gun.draw(screen, surf, event)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             gun.fire2_start(event)
         elif event.type == pygame.MOUSEBUTTONUP:
