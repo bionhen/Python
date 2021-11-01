@@ -96,8 +96,6 @@ class Gun:
         Происходит при отпускании кнопки мыши.
         Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
         """
-        global bullet
-        bullet += 1
         new_ball = Ball(self.screen, 100, 580, 20, 10, 10 * math.tan(self.an), RED)
         new_ball.r = 15
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
@@ -109,7 +107,7 @@ class Gun:
     def targetting(self, event):
         """Прицеливание. Зависит от положения мыши."""
         if event:
-            self.an = math.atan((event.pos[1]-450) / (event.pos[0]-20))
+            self.an = math.atan((event.pos[1]-400) / (event.pos[0]-20))
         if self.f2_on:
             self.color = RED
         else:
@@ -117,8 +115,8 @@ class Gun:
 
     def draw(self, screen, surface, event):
         self.screen = screen
-        self.an = math.atan((event.pos[1] - 450) / (event.pos[0] - 20))
-        self.surface = surf
+        self.an = math.atan((event.pos[1] - 400) / (event.pos[0] - 20))
+        self.surface = surface
         pygame.draw.rect(
             self.surface,
             BLACK,
@@ -156,7 +154,8 @@ class Target(Ball):
 
     def hit(self, points):
         """Попадание шарика в цель."""
-        self.points += points
+        self.points = points
+        self.points += 1
 
     def draw(self):
         pygame.draw.circle(
@@ -166,6 +165,20 @@ class Target(Ball):
                 self.r
             )
 
+
+class Bullet(Ball):
+    def __init__(self, screen, x, y, r, vx, vy, color):
+     super().__init__(screen, x, y, r, vx, vy, color)
+     self.points = points
+     self.screen = screen
+
+    def draw(self):
+        pygame.draw.circle(
+                self.screen,
+                self.color,
+                (self.x, self.y),
+                self.r
+            )
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 points = 0
@@ -189,18 +202,19 @@ finished = False
 while not finished:
     screen.fill(WHITE)
     for i in range(l):
-       Ball.draw(Targets[i])
-       Ball.move(Targets[i])
+        Ball.draw(Targets[i])
+        Ball.move(Targets[i])
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
+        elif event.type == pygame.MOUSEMOTION:
+            gun.targetting(event)
+            gun.draw(screen, surf, event)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             gun.fire2_start(event)
         elif event.type == pygame.MOUSEBUTTONUP:
             gun.fire2_end(event)
-        elif event.type == pygame.MOUSEMOTION:
-            gun.targetting(event)
-            gun.draw(screen, surf, event)
+
         #for i in range(l):
             #if Targets[i].hittest(new_ball) == True:
                 #Targets.pop(i)
