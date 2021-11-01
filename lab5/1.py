@@ -185,7 +185,6 @@ class Bullet(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color):
      super().__init__(screen, x, y, r, vx, vy, color)
      self.screen = screen
-
     def draw(self):
         pygame.draw.circle(
                 self.screen,
@@ -194,14 +193,13 @@ class Bullet(Ball):
                 self.r
             )
 
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 
 points = 0
 
 Targets = []
-for i in range(randint(3, 6)):
+for i in range(randint(2, 5)):
     x = randint(100, 700)
     y = randint(100, 500)
     r = randint(30, 50)
@@ -220,6 +218,7 @@ gun = Gun(screen, surf)
 finished = False
 
 while not finished:
+    s = len(Bullets)
     screen.fill(WHITE)
     f1 = pygame.font.Font(None, 50)
     text1 = f1.render(str(score), True, (180, 0, 0))
@@ -242,12 +241,11 @@ while not finished:
             gun.fire2_end(event)
             (x_mouse, y_mouse) = pygame.mouse.get_pos()
             angle = math.atan2((-y_mouse + 450), (x_mouse - 20))
-            new_ball1 = Ball(screen, 20, 450, 20, POWER/2.5 * math.cos(angle),  POWER/2.5 * math.sin(angle), GAME_COLORS[randint(0, 5)])
+            new_ball1 = Bullet(screen, 20, 450, 20, POWER/2.5 * math.cos(angle),  POWER/2.5 * math.sin(angle), GAME_COLORS[randint(0, 5)])
             Bullets.append(new_ball1)
-            s = len(Bullets)
     for i in range(s):
-        Ball.draw(Bullets[i])
-        Ball.move(Bullets[i])
+        Bullet.draw(Bullets[i])
+        Bullet.move(Bullets[i])
         for i in range(l):
            for j in range(s):
             if Targets[i].hittest(Bullets[j]) == True:
@@ -263,9 +261,10 @@ while not finished:
                 Targets.append(my_ball)
 
     gun.power_up()
-    for i in range(s):
+    for i in range(s-1):
         if Bullets[i].vx == 0:
             Bullets.pop(i)
+            s = s-1
     for i in range(l):
         if Targets[i].vx == 0:
             Targets.pop(i)
