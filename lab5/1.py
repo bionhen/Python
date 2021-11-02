@@ -180,6 +180,15 @@ class Target(Ball):
                 self.r
             )
 
+    def collision(self, obj, p, q):
+        if (self.x-obj.x)**2 + (self.y-obj.y)**2 <= (self.r + obj.r)**2:
+            p = obj.vx
+            q = obj.vy
+            obj.vx = self.vx
+            obj.vy = self.vy
+            self.vx = p
+            self.vy = q
+
 
 class Bullet(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color):
@@ -200,7 +209,7 @@ points = 0
 
 Targets = []
 for i in range(randint(2, 5)):
-    x = randint(100, 700)
+    x = randint(100+100*2*i, 200+100*2*i)
     y = randint(100, 500)
     r = randint(30, 50)
     vx = randint(-2, 2)
@@ -251,7 +260,7 @@ while not finished:
             if Targets[i].hittest(Bullets[j]) == True:
                 Targets.pop(i)
                 score += 1
-                x = randint(100, 700)
+                x= randint(100 + 100 * 2 * i, 200 + 100 * 2 * i)
                 y = randint(100, 500)
                 r = randint(30, 50)
                 vx = randint(-2, 2)
@@ -259,7 +268,9 @@ while not finished:
                 COLOR = GAME_COLORS[randint(0, 5)]
                 my_ball = Target(screen, x, y, r, vx, vy, COLOR, points)
                 Targets.append(my_ball)
-
+    for i in range(l):
+        for j in range(i+1, l, 1):
+            Target.collision(Targets[i], Targets[j], 2, 2)
     gun.power_up()
     for i in range(s-1):
         if Bullets[i].vx == 0:
@@ -268,7 +279,6 @@ while not finished:
     for i in range(l):
         if Targets[i].vx == 0:
             Targets.pop(i)
-            score += 1
             x = randint(100, 700)
             y = randint(100, 500)
             r = randint(30, 50)
