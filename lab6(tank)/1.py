@@ -23,7 +23,7 @@ HEIGHT = 800
 surf = pygame.Surface((200, 100))
 
 class Ball:
-    def __init__(self, screen: pygame.Surface, x, y, r, vx, vy, color):
+    def __init__(self, screen: pygame.Surface, x, y, r, vx, vy, color, g):
         """ Конструктор класса ball
 
         Args:
@@ -36,7 +36,7 @@ class Ball:
         self.y = y
         self.r = r
         self.vx = vx
-        self.g = 10
+        self.g = g
         self.vy = vy
         self.color = color
         self.live = 30
@@ -105,7 +105,7 @@ class Gun:
         Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
         """
         (x_mouse, y_mouse) = pygame.mouse.get_pos()
-        new_ball = Ball(self.screen, 100, 580, 20, 10, 10 * math.tan(self.an), RED)
+        new_ball = Ball(self.screen, 100, 580, 20, 10, 10 * math.tan(self.an), RED, g)
         self.an = math.atan2((-y_mouse + self.y2), (x_mouse - self.x2))
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
@@ -151,9 +151,8 @@ class Gun:
             self.color = GREEN
 
 class Target(Ball):
-    def __init__(self, screen, x, y, r, vx, vy, color, points):
-     super().__init__(screen, x, y, r, vx, vy, color)
-     self.points = points
+    def __init__(self, screen, x, y, r, vx, vy, color, g):
+     super().__init__(screen, x, y, r, vx, vy, color, g)
      self.screen = screen
 
     def hittest(self, obj):
@@ -188,8 +187,8 @@ class Target(Ball):
 
 
 class Bullet(Ball):
-    def __init__(self, screen, x, y, r, vx, vy, color):
-     super().__init__(screen, x, y, r, vx, vy, color)
+    def __init__(self, screen, x, y, r, vx, vy, color, g):
+     super().__init__(screen, x, y, r, vx, vy, color, g)
      self.screen = screen
     def draw(self):
         pygame.draw.circle(
@@ -199,8 +198,8 @@ class Bullet(Ball):
                 self.r
             )
 class Bomb(Ball):
-    def __init__(self, screen, x, y, r, vx, vy, color):
-     super().__init__(screen, x, y, r, vx, vy, color)
+    def __init__(self, screen, x, y, r, vx, vy, color, g):
+     super().__init__(screen, x, y, r, vx, vy, color,g)
      self.screen = screen
     def draw(self):
         pygame.draw.circle(
@@ -245,12 +244,13 @@ points = 0
 Targets = []
 for i in range(randint(2, 5)):
     x = randint(100+100*2*i, 200+100*2*i)
-    y = randint(100, 500)
+    y = 100*i
     r = randint(30, 50)
-    vx = randint(-2, 2)
-    vy = randint(-10, 10)
+    vx = randint(-10, 10)
+    vy = 0
     COLOR = GAME_COLORS[randint(0, 5)]
-    my_ball = Target(screen, x, y, r, vx, vy, COLOR, points)
+    g = 0
+    my_ball = Target(screen, x, y, r, vx, vy, COLOR, g)
     Targets.append(my_ball)
 l = len(Targets)
 bullet = 0
@@ -296,7 +296,7 @@ while not finished:
             Tank.fire2_end(tank, event)
             (x_mouse, y_mouse) = pygame.mouse.get_pos()
             angle = math.atan2((-y_mouse + 535), (x_mouse - tank.x+30))
-            new_ball1 = Bullet(screen, tank.x+30, 535, 10, POWER/2.5 * math.cos(angle),  POWER/2.5 * math.sin(angle), GAME_COLORS[randint(0, 5)])
+            new_ball1 = Bullet(screen, tank.x+30, 535, 10, POWER/2.5 * math.cos(angle),  POWER/2.5 * math.sin(angle), GAME_COLORS[randint(0, 5)], 10)
             Bullets.append(new_ball1)
     if fla == True:
             Tank.move(tank, -1)
@@ -311,10 +311,10 @@ while not finished:
                 Targets.pop(i)
                 score += 1
                 x = randint(100 + 100 * 2 * i, 200 + 100 * 2 * i)
-                y = randint(100, 500)
+                y = 100*i
                 r = randint(30, 50)
-                vx = randint(-2, 2)
-                vy = randint(-10, 10)
+                vx = randint(-10, 10)
+                vy = 0
                 COLOR = GAME_COLORS[randint(0, 5)]
                 my_ball = Target(screen, x, y, r, vx, vy, COLOR, points)
                 Targets.append(my_ball)
@@ -332,10 +332,10 @@ while not finished:
             x = randint(100, 700)
             y = randint(100, 500)
             r = randint(30, 50)
-            vx = randint(-2, 2)
-            vy = randint(-10, 10)
+            vx = randint(-10, 10)
+            vy = 0
             COLOR = GAME_COLORS[randint(0, 5)]
-            my_ball = Target(screen, x, y, r, vx, vy, COLOR, points)
+            my_ball = Target(screen, x, y, r, vx, vy, COLOR, 0)
             Targets.append(my_ball)
     pygame.display.update()
 
