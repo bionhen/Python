@@ -211,17 +211,18 @@ class Bomb(Ball):
 
 
 class Tank(Gun):
-    def __init__(self, screen, x, vx):
+    def __init__(self, screen, x, vx, health):
         super().__init__(self, x, y)
         self.screen = screen
         self.x = x
         self.y = y
         self.vx = vx
+        self.health = health
 
     def draw(self):
         pygame.draw.rect(self.screen, BLACK, (self.x, 550, 50, 20))
-        pygame.draw.rect(self.screen, BLACK, (self.x+10, 520, 20, 30))
-        Tank.draw1(self, self.x + 30, 535)
+        pygame.draw.rect(self.screen, BLACK, (self.x+10, 520, 30, 30))
+        Tank.draw1(self, self.x + 25, 535)
 
     def move(self, d):
         if d == 1:
@@ -230,10 +231,9 @@ class Tank(Gun):
         elif d == -1:
              self.x += -self.vx
 
-
-
-
-
+    def hit(self, obj):
+        if obj.x > self.x and obj.x < self.x + 50 and obj.y<570 and obj.y > 550:
+            self.health-=10
 
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -256,16 +256,18 @@ l = len(Targets)
 bullet = 0
 s = 0
 score = 0
-Bullets = []
+Bullets1 = []
+Bullets2 = []
 clock = pygame.time.Clock()
-tank1 = Tank(screen, 300, 20)
-tank2 = Tank(screen, 500, 20)
+tank1 = Tank(screen, 300, 20, 100)
+tank2 = Tank(screen, 500, 20, 100)
 finished = False
 fla = fld = False
 fl_left = fl_right = False
 
 while not finished:
-    s = len(Bullets)
+    s1 = len(Bullets1)
+    s2 = len(Bullets2)
     screen.fill(WHITE)
     Tank.draw(tank2)
     Tank.draw(tank1)
@@ -310,13 +312,13 @@ while not finished:
             (x_mouse2, y_mouse2) = pygame.mouse.get_pos()
             angle2 = math.atan2((-y_mouse2 + 535), (x_mouse2 - tank2.x+30))
             new_ball2 = Bullet(screen, tank2.x+30, 535, 10, POWER/2.5 * math.cos(angle2),  POWER/2.5 * math.sin(angle2), GAME_COLORS[randint(0, 5)], 10)
-            Bullets.append(new_ball2)
+            Bullets2.append(new_ball2)
             Tank.fire2_end(tank1, event)
             (x_mouse1, y_mouse1) = pygame.mouse.get_pos()
             angle1 = math.atan2((-y_mouse1 + 535), (x_mouse1 - tank1.x + 30))
             new_ball1 = Bullet(screen, tank1.x + 30, 535, 10, POWER / 2.5 * math.cos(angle1),
                                POWER / 2.5 * math.sin(angle1), GAME_COLORS[randint(0, 5)], 10)
-            Bullets.append(new_ball1)
+            Bullets1.append(new_ball1)
 
     if fl_right == True:
         Tank.move(tank2, 1)
