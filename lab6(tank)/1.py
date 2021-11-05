@@ -328,12 +328,28 @@ while not finished:
         Tank.move(tank1, 1)
     elif fla == True:
         Tank.move(tank1, -1)
-    for i in range(s):
-        Bullet.draw(Bullets[i])
-        Bullet.move(Bullets[i])
+    for i in range(s1):
+        Bullet.draw(Bullets1[i])
+        Bullet.move(Bullets1[i])
         for i in range(l):
-           for j in range(s):
-            if Targets[i].hittest(Bullets[j]) == True:
+           for j in range(s1):
+            if Targets[i].hittest(Bullets1[j]) == True:
+                Targets.pop(i)
+                score += 1
+                x = randint(100 + 100 * 2 * i, 200 + 100 * 2 * i)
+                y = 100*i
+                r = randint(30, 50)
+                vx = randint(-10, 10)
+                vy = 0
+                COLOR = GAME_COLORS[randint(0, 5)]
+                my_ball = Target(screen, x, y, r, vx, vy, COLOR, points)
+                Targets.append(my_ball)
+    for i in range(s2):
+        Bullet.draw(Bullets2[i])
+        Bullet.move(Bullets2[i])
+        for i in range(l):
+           for j in range(s2):
+            if Targets[i].hittest(Bullets2[j]) == True:
                 Targets.pop(i)
                 score += 1
                 x = randint(100 + 100 * 2 * i, 200 + 100 * 2 * i)
