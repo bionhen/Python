@@ -258,14 +258,17 @@ s = 0
 score = 0
 Bullets = []
 clock = pygame.time.Clock()
-tank = Tank(screen, 300, 20)
+tank1 = Tank(screen, 300, 20)
+tank2 = Tank(screen, 500, 20)
 finished = False
 fla = fld = False
+fl_left = fl_right = False
 
 while not finished:
     s = len(Bullets)
     screen.fill(WHITE)
-    Tank.draw(tank)
+    Tank.draw(tank2)
+    Tank.draw(tank1)
     f1 = pygame.font.Font(None, 50)
     text1 = f1.render(str(score), True, (180, 0, 0))
     text2 = f1.render('score:', True, (180, 0, 0))
@@ -279,29 +282,50 @@ while not finished:
         if event.type == pygame.QUIT:
             finished = True
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a:
+            if event.key == pygame.K_LEFT:
+                fl_left = True
+            elif event.key == pygame.K_a:
                 fla = True
-            elif event .key == pygame.K_d:
+            elif event.key == pygame.K_RIGHT:
+                fl_right = True
+            elif event.key == pygame.K_d:
                 fld = True
         elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                fl_left = False
             if event.key == pygame.K_a:
                 fla = False
-            elif event .key == pygame.K_d:
+            elif event.key == pygame.K_RIGHT:
+                fl_right = False
+            elif event.key == pygame.K_d:
                 fld = False
         elif event.type == pygame.MOUSEMOTION:
-            Tank.targetting(tank, event)
+            Tank.targetting(tank2, event)
+            Tank.targetting(tank1, event)
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            Tank.fire2_start(tank, event)
+            Tank.fire2_start(tank2, event)
+            Tank.fire2_start(tank1, event)
         elif event.type == pygame.MOUSEBUTTONUP:
-            Tank.fire2_end(tank, event)
-            (x_mouse, y_mouse) = pygame.mouse.get_pos()
-            angle = math.atan2((-y_mouse + 535), (x_mouse - tank.x+30))
-            new_ball1 = Bullet(screen, tank.x+30, 535, 10, POWER/2.5 * math.cos(angle),  POWER/2.5 * math.sin(angle), GAME_COLORS[randint(0, 5)], 10)
+            Tank.fire2_end(tank2, event)
+            (x_mouse2, y_mouse2) = pygame.mouse.get_pos()
+            angle2 = math.atan2((-y_mouse2 + 535), (x_mouse2 - tank2.x+30))
+            new_ball2 = Bullet(screen, tank2.x+30, 535, 10, POWER/2.5 * math.cos(angle2),  POWER/2.5 * math.sin(angle2), GAME_COLORS[randint(0, 5)], 10)
+            Bullets.append(new_ball2)
+            Tank.fire2_end(tank1, event)
+            (x_mouse1, y_mouse1) = pygame.mouse.get_pos()
+            angle1 = math.atan2((-y_mouse1 + 535), (x_mouse1 - tank1.x + 30))
+            new_ball1 = Bullet(screen, tank1.x + 30, 535, 10, POWER / 2.5 * math.cos(angle1),
+                               POWER / 2.5 * math.sin(angle1), GAME_COLORS[randint(0, 5)], 10)
             Bullets.append(new_ball1)
-    if fla == True:
-            Tank.move(tank, -1)
+
+    if fl_right == True:
+        Tank.move(tank2, 1)
+    elif fl_left == True:
+        Tank.move(tank2, -1)
     if fld == True:
-            Tank.move(tank, 1)
+        Tank.move(tank1, 1)
+    elif fla == True:
+        Tank.move(tank1, -1)
     for i in range(s):
         Bullet.draw(Bullets[i])
         Bullet.move(Bullets[i])
@@ -321,7 +345,8 @@ while not finished:
     for i in range(l):
         for j in range(i+1, l, 1):
             Target.collision(Targets[i], Targets[j], 2, 2)
-    Tank.power_up(tank)
+    Tank.power_up(tank2)
+    Tank.power_up(tank1)
     for i in range(s-1):
         if Bullets[i].vx == 0:
             Bullets.pop(i)
