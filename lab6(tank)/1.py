@@ -233,7 +233,7 @@ class Tank(Gun):
 
     def hit(self, obj):
         if obj.x > self.x and obj.x < self.x + 50 and obj.y<570 and obj.y > 550:
-            self.health-=10
+            self.health -= 10
 
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -264,6 +264,8 @@ tank2 = Tank(screen, 500, 20, 100)
 finished = False
 fla = fld = False
 fl_left = fl_right = False
+Bombs = []
+
 
 while not finished:
     s1 = len(Bullets1)
@@ -271,6 +273,17 @@ while not finished:
     screen.fill(WHITE)
     Tank.draw(tank2)
     Tank.draw(tank1)
+    for i in range(l):
+        x = Targets[i].x
+        y = Targets[i].y
+        r = 10
+        vx = 0
+        vy = 10
+        g = 10
+        new_bomb = Bullet(screen, x, y, r, vx, vy, BLACK, g)
+        Bombs.append(new_bomb)
+
+
     f1 = pygame.font.Font(None, 50)
     text1 = f1.render(str(score), True, (180, 0, 0))
     text2 = f1.render('score:', True, (180, 0, 0))
@@ -363,11 +376,21 @@ while not finished:
     for i in range(l):
         for j in range(i+1, l, 1):
             Target.collision(Targets[i], Targets[j], 2, 2)
+    for i in range(l):
+        Bombs[i].move()
+        Bombs[i].draw()
+        Tank.hit(tank1, Bombs[i])
+        Tank.hit(tank2, Bombs[i])
+
     Tank.power_up(tank2)
     Tank.power_up(tank1)
-    for i in range(s-1):
-        if Bullets[i].vx == 0:
-            Bullets.pop(i)
+    for i in range(s1-1):
+        if Bullets1[i].vx == 0:
+            Bullets1.pop(i)
+            s = s-1
+    for i in range(s2-1):
+        if Bullets2[i].vx == 0:
+            Bullets2.pop(i)
             s = s-1
     for i in range(l):
         if Targets[i].vx == 0:
