@@ -22,6 +22,7 @@ HEIGHT = 800
 
 surf = pygame.Surface((200, 100))
 
+
 class Ball:
     def __init__(self, screen: pygame.Surface, x, y, r, vx, vy, color, g):
         """ Конструктор класса ball
@@ -54,23 +55,24 @@ class Ball:
         if self.x - self.r <= 0:
             self.vx = -self.vx/1.1
             self.vy = self.vy/1.1
-            self.x += self.r/100
-        if self.x +self.r >= 800:
+            self.x += 10
+        if self.x + self.r >= 800:
             self.vx = -self.vx / 1.1
             self.vy = self.vy / 1.1
-            self.x -= self.r / 100
+            self.x -= 10
         if self.y - self.r <= 0:
             self.vy = -self.vy / 1.1
             self.vx = self.vx / 1.1
-            self.y += self.r / 100
-        if self.y +self.r >= 600:
+            self.y += 10
+        if self.y + self.r >= 600:
             self.vy = -self.vy / 1.1
             self.vx = self.vx / 1.1
-            self.y += self.r / 100
+            self.y -= 10
         if self.x <= 0 or self.x >= 800 or self.y <= 0 or self.y >= 600:
             self.vx = 0
             self.vy = 0
-            self.g=0
+            self.g = 0
+
     def draw(self):
         pygame.draw.circle(
             self.screen,
@@ -173,10 +175,9 @@ class Target(Ball):
         Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
         if (obj.x - self.x) ** 2 + (obj.y - self.y) ** 2 <= (self.r + obj.r) ** 2:
-           return True
+            return True
         else:
-           return False
-
+            return False
 
     def draw(self):
         pygame.draw.circle(
@@ -208,10 +209,12 @@ class Bullet(Ball):
                 (self.x, self.y),
                 self.r
             )
+
 class Bomb(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color, g):
      super().__init__(screen, x, y, r, vx, vy, color,g)
      self.screen = screen
+
     def draw(self):
         pygame.draw.circle(
                 self.screen,
@@ -253,7 +256,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 points = 0
 
 Targets = []
-for i in range(randint(2, 5)):
+for i in range(randint(5, 7)):
     x = randint(100+100*2*i, 200+100*2*i)
     y = 100*i
     r = randint(30, 50)
@@ -283,8 +286,10 @@ while not finished:
     s1 = len(Bullets1)
     s2 = len(Bullets2)
     screen.fill(WHITE)
-    Tank.draw(tank2)
-    Tank.draw(tank1)
+    while tank2.health > 0:
+        Tank.draw(tank2)
+    while tank2.health > 0:
+        Tank.draw(tank1)
     for i in range(l):
         x = Targets[i].x
         y = Targets[i].y
@@ -294,7 +299,6 @@ while not finished:
         g = 10
         new_bomb = Bullet(screen, x, y, r, vx, vy, BLACK, g)
         Bombs.append(new_bomb)
-
 
     f1 = pygame.font.Font(None, 50)
     text1 = f1.render(str(score), True, (180, 0, 0))
@@ -326,33 +330,46 @@ while not finished:
                 fl_right = False
             elif event.key == pygame.K_d:
                 fld = False
+            elif event.key == pygame.K_1:
+                flag1 = True
+                flag2 = False
+            elif event.key == pygame.K_2:
+                flag2 = True
+                flag1 = False
         elif event.type == pygame.MOUSEMOTION:
-            Tank.targetting(tank2, event)
-            Tank.targetting(tank1, event)
+            if flag2:
+                Tank.targetting(tank2, event)
+            if flag1:
+                Tank.targetting(tank1, event)
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            Tank.fire2_start(tank2, event)
-            Tank.fire2_start(tank1, event)
+            if flag2:
+                Tank.fire2_start(tank2, event)
+            if flag1:
+                Tank.fire2_start(tank1, event)
         elif event.type == pygame.MOUSEBUTTONUP:
+          if flag2:
             Tank.fire2_end(tank2, event)
             (x_mouse2, y_mouse2) = pygame.mouse.get_pos()
             angle2 = math.atan2((-y_mouse2 + 535), (x_mouse2 - tank2.x+30))
             new_ball2 = Bullet(screen, tank2.x+30, 535, 10, POWER/2.5 * math.cos(angle2),  POWER/2.5 * math.sin(angle2), GAME_COLORS[randint(0, 5)], 10)
             Bullets2.append(new_ball2)
+          elif flag1:
             Tank.fire2_end(tank1, event)
             (x_mouse1, y_mouse1) = pygame.mouse.get_pos()
             angle1 = math.atan2((-y_mouse1 + 535), (x_mouse1 - tank1.x + 30))
             new_ball1 = Bullet(screen, tank1.x + 30, 535, 10, POWER / 2.5 * math.cos(angle1),
                                POWER / 2.5 * math.sin(angle1), GAME_COLORS[randint(0, 5)], 10)
             Bullets1.append(new_ball1)
-
-    if fl_right == True:
-        Tank.move(tank2, 1)
-    elif fl_left == True:
-        Tank.move(tank2, -1)
-    if fld == True:
-        Tank.move(tank1, 1)
-    elif fla == True:
-        Tank.move(tank1, -1)
+    if flag2:
+        if fl_right == True:
+            Tank.move(tank2, 1)
+        elif fl_left == True:
+            Tank.move(tank2, -1)
+    if flag1:
+        if fld == True:
+            Tank.move(tank1, 1)
+        elif fla == True:
+            Tank.move(tank1, -1)
     for i in range(s1):
         Bullet.draw(Bullets1[i])
         Bullet.move(Bullets1[i])
@@ -391,11 +408,14 @@ while not finished:
     for i in range(l):
         Bombs[i].move()
         Bombs[i].draw()
-        Tank.hit(tank1, Bombs[i])
-        Tank.hit(tank2, Bombs[i])
-
-    Tank.power_up(tank2)
-    Tank.power_up(tank1)
+        if flag1:
+            Tank.hit(tank1, Bombs[i])
+        if flag2:
+            Tank.hit(tank2, Bombs[i])
+    if flag2:
+        Tank.power_up(tank2)
+    if flag1:
+        Tank.power_up(tank1)
     for i in range(s1-1):
         if Bullets1[i].vx == 0:
             Bullets1.pop(i)

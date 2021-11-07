@@ -22,6 +22,7 @@ HEIGHT = 800
 
 surf = pygame.Surface((200, 100))
 
+
 class Ball:
     def __init__(self, screen: pygame.Surface, x, y, r, vx, vy, color):
         """ Конструктор класса ball
@@ -60,7 +61,8 @@ class Ball:
         if self.x <= 0 or self.x >= 800 or self.y <= 0 or self.y >= 600:
             self.vx = 0
             self.vy = 0
-            self.g=0
+            self.g = 0
+
     def draw(self):
         pygame.draw.circle(
             self.screen,
@@ -95,6 +97,7 @@ class Gun:
         self.y = y
         self.length = 30
         self.width = 5
+
     def fire2_start(self, event):
         self.f2_on = 1
 
@@ -149,6 +152,7 @@ class Gun:
         else:
             self.color = GREEN
 
+
 class Target(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color, points):
      super().__init__(screen, x, y, r, vx, vy, color)
@@ -192,8 +196,9 @@ class Target(Ball):
 
 class Bullet(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color):
-     super().__init__(screen, x, y, r, vx, vy, color)
-     self.screen = screen
+        super().__init__(screen, x, y, r, vx, vy, color)
+        self.screen = screen
+
     def draw(self):
         pygame.draw.circle(
                 self.screen,
