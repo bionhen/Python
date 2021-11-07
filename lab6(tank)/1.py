@@ -51,12 +51,22 @@ class Ball:
         self.vy += -self.g/30
         self.x += self.vx
         self.y -= self.vy
-        if self.x - self.r <= 0 or self.x +self.r >= 800:
-            self.vx = -self.vx/1.2
+        if self.x - self.r <= 0:
+            self.vx = -self.vx/1.1
             self.vy = self.vy/1.1
-        if self.y - self.r <= 0 or self.y +self.r >= 600:
-            self.vy = -self.vy/1.2
+            self.x += self.r/100
+        if self.x +self.r >= 800:
+            self.vx = -self.vx / 1.1
+            self.vy = self.vy / 1.1
+            self.x -= self.r / 100
+        if self.y - self.r <= 0:
+            self.vy = -self.vy / 1.1
             self.vx = self.vx / 1.1
+            self.y += self.r / 100
+        if self.y +self.r >= 600:
+            self.vy = -self.vy / 1.1
+            self.vx = self.vx / 1.1
+            self.y += self.r / 100
         if self.x <= 0 or self.x >= 800 or self.y <= 0 or self.y >= 600:
             self.vx = 0
             self.vy = 0
@@ -184,6 +194,7 @@ class Target(Ball):
             obj.vy = self.vy
             self.vx = p
             self.vy = q
+            self.x -= (obj.x-self.x)/100
 
 
 class Bullet(Ball):
@@ -256,6 +267,7 @@ l = len(Targets)
 bullet = 0
 s = 0
 score = 0
+flag1 = flag2 = False
 Bullets1 = []
 Bullets2 = []
 clock = pygame.time.Clock()
