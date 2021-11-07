@@ -286,9 +286,9 @@ while not finished:
     s1 = len(Bullets1)
     s2 = len(Bullets2)
     screen.fill(WHITE)
-    while tank2.health > 0:
+    if tank2.health > 0:
         Tank.draw(tank2)
-    while tank2.health > 0:
+    if tank1.health > 0:
         Tank.draw(tank1)
     for i in range(l):
         x = Targets[i].x
@@ -435,6 +435,13 @@ while not finished:
             COLOR = GAME_COLORS[randint(0, 5)]
             my_ball = Target(screen, x, y, r, vx, vy, COLOR, 0)
             Targets.append(my_ball)
+    if flag2:
+        for i in range(l):
+            Tank.hit(tank2, Bombs[i])
+    if flag1:
+        for i in range(l):
+            Tank.hit(tank1, Bombs[i])
+    print(tank1.health)
     pygame.display.update()
 
     clock.tick(FPS)
