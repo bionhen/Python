@@ -162,6 +162,7 @@ class Gun:
         else:
             self.color = GREEN
 
+
 class Target(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color, g):
      super().__init__(screen, x, y, r, vx, vy, color, g)
@@ -210,6 +211,7 @@ class Bullet(Ball):
                 self.r
             )
 
+
 class Bomb(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color, g):
      super().__init__(screen, x, y, r, vx, vy, color,g)
@@ -248,7 +250,6 @@ class Tank(Gun):
     def hit(self, obj):
         if obj.x > self.x and obj.x < self.x + 50 and obj.y<570 and obj.y > 550:
             self.health -= 10
-
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -370,11 +371,12 @@ while not finished:
             Tank.move(tank1, 1)
         elif fla == True:
             Tank.move(tank1, -1)
+
     for i in range(s1):
         Bullet.draw(Bullets1[i])
         Bullet.move(Bullets1[i])
         for i in range(l):
-           for j in range(s1):
+          for j in range(s1):
             if Targets[i].hittest(Bullets1[j]) == True:
                 Targets.pop(i)
                 score += 1
@@ -441,7 +443,22 @@ while not finished:
     if flag1:
         for i in range(l):
             Tank.hit(tank1, Bombs[i])
-    print(tank1.health)
+    if tank1.health > 0:
+        for i in range(s2):
+            Tank.hit(tank1, Bullets2[i])
+    if tank2.health > 0:
+        for i in range(s1):
+            Tank.hit(tank2, Bullets1[i])
+            if Bullets1[i].x > tank2.x and Bullets1[i].x < tank2.x + 50 and Bullets1[i].y < 570 and Bullets1[i].y > 550:
+             Bullets1.pop(i)
+             x = Targets[i].x
+             y = Targets[i].y
+             r = 10
+             vx = 0
+             vy = 10
+             g = 10
+             new_bomb = Bullet(screen, x, y, r, vx, vy, BLACK, g)
+             Bombs.append(new_bomb)
     pygame.display.update()
 
     clock.tick(FPS)
