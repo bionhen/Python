@@ -375,7 +375,7 @@ while not finished:
     write('score2:', score2, 610, 50, 180)
     write('score1:', score1, 10, 50, 180)
     if timer < 100:
-        write('Нажмите 1 или 2 для переключения между танками', -1, 100, 300, 180)
+        write('Нажмите 1 или 2 для выбора и переключения', -1, 100, 300, 180)
         write('AD-движение 1, стрелки - движение 2', -1, 100, 340, 180)
         timer += 1
     if tank2.health > 0:
@@ -538,7 +538,6 @@ while not finished:
     if len(Bullets1) > 0:
         if control1 <= len(Bullets1):
             Bullets1.pop(control1)
-    print(tank2.health)
     pygame.display.update()
     clock.tick(FPS)
 pygame.quit()
