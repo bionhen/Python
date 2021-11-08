@@ -98,6 +98,13 @@ class Ball:
 
 
 class Rect:
+    """
+    Конструктор класса Rect
+    Args:
+    x, y, a, b - координаты верхнего левого угла и длины сторон
+    vx, vy - скорости по осям
+    color - цвет прямоугольника
+    """
     def __init__(self, screen, x, y, a, b, vx, vy, color):
         self.x = x
         self.y = y
@@ -134,8 +141,16 @@ class Rect:
             self.y -= 10
 
     def draw(self):
+        """
+        Метод рисует прямоугольник
+        """
         pygame.draw.rect(self.screen, self.color, (self.x, self.y, self.a, self.b))
+
     def hittest(self, obj):
+        """
+        Метод проверяет координаты объеекта obj и если они попадают в область прямоугольника функция
+        возвращает True
+        """
         if obj.x > self.x and obj.x < self.x + self.a and obj.y > self.y and obj.y < self.y + self.b:
             return True
 
