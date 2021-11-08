@@ -291,9 +291,19 @@ class Tank(Gun):
         if obj.x > self.x and obj.x < self.x + 50 and obj.y<570 and obj.y > 520:
             self.health -= 10
 
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-superbombs = []
+
+def write(string, score, x, y, a):
+    f0 = pygame.font.Font(None, 50)
+    if score > -1:
+        text10 = f0.render(str(score), True, (a, 0, 0))
+        screen.blit(text10, (x + 150, y))
+    string = str(string)
+    text20 = f0.render(string, True, (a, 0, 0))
+    screen.blit(text20, (x, y))
+
 
 Targets = []
 for i in range(randint(5, 7)):
@@ -333,8 +343,10 @@ T = []
 control = 100
 for i in range(l):
     T.append(0)
+timer = 0
 
 while not finished:
+    control1 = control2 = 100
     if T[1] == 101:
         for i in range(l):
             T[i] = 0
@@ -360,19 +372,22 @@ while not finished:
             Bombs.append(new_bomb)
     for i in range(s1):
         Bullet.delete(Bullets1[i], Bullets1)
-
-    f1 = pygame.font.Font(None, 50)
-    text1 = f1.render(str(score2), True, (180, 0, 0))
-    text2 = f1.render('score2:', True, (180, 0, 0))
-    screen.blit(text1, (750, 50))
-    screen.blit(text2, (610, 50))
-
-    f2 = pygame.font.Font(None, 50)
-    text1 = f2.render(str(score1), True, (180, 0, 0))
-    text2 = f2.render('score1:', True, (180, 0, 0))
-    screen.blit(text1, (150, 50))
-    screen.blit(text2, (10, 50))
-
+    write('score2:', score2, 610, 50, 180)
+    write('score1:', score1, 10, 50, 180)
+    if timer < 100:
+        write('Нажмите 1 или 2 для переключения между танками', -1, 100, 300, 180)
+        write('AD-движение 1, стрелки - движение 2', -1, 100, 340, 180)
+        timer += 1
+    if tank2.health > 0:
+        write('health2:', tank2.health, 610, 80, 180)
+    else:
+        write('health2:', 0, 610, 80, 180)
+        write('Первый победил', -2, 300, 400, 180)
+    if tank1.health > 0:
+        write('health1:', tank1.health, 10, 80, 180)
+    else:
+        write('health1:', 0, 10, 80, 180)
+        write('Второй победил', -2, 300, 400, 180)
     x1, y1 = pygame.mouse.get_pos()
     for i in range(l):
         Ball.draw(Targets[i])
@@ -507,6 +522,11 @@ while not finished:
        if s2 > 0:
         for i in range(s2):
             Tank.hit(tank1, Bullets2[i])
+            if Bullets2[i].x > tank1.x and Bullets2[i].x < tank1.x + 50 and Bullets2[i].y < 570 and Bullets2[i].y > 520:
+                control2 = i
+    if len(Bullets2) > 0:
+        if control2 <= len(Bullets2):
+            Bullets2.pop(control2)
     if tank2.health > 0:
         s1 = len(Bullets1)
         s2 = len(Bullets2)
@@ -514,9 +534,10 @@ while not finished:
             for i in range(s1):
                 Tank.hit(tank2, Bullets1[i])
                 if Bullets1[i].x > tank2.x and Bullets1[i].x < tank2.x + 50 and Bullets1[i].y < 570 and Bullets1[i].y > 520:
-                    control = i
+                    control1 = i
     if len(Bullets1) > 0:
-        Bullets1.pop(control)
+        if control1 <= len(Bullets1):
+            Bullets1.pop(control1)
     print(tank2.health)
     pygame.display.update()
     clock.tick(FPS)
