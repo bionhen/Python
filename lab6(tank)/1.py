@@ -30,7 +30,9 @@ class Ball:
         Args:
         x - начальное положение мяча по горизонтали
         y - начальное положение мяча по вертикали
-
+        r - радиус мяча
+        vx, vy, g - скорости по x, y и ускорение по y
+        color - цвет
         """
         self.screen = screen
         self.x = x
@@ -74,6 +76,10 @@ class Ball:
             self.g = 0
 
     def draw(self):
+        """Нарисовать шарик
+
+         Метод рисует шарик в координатах x, y
+        """
         pygame.draw.circle(
             self.screen,
             self.color,
@@ -96,6 +102,14 @@ class Ball:
 
 
 class Gun:
+    """Конструктор класса Gun
+
+    Args:
+    x2, y2 - точки фиксированного конца пушки
+    length - длина пушки
+    width - ширина
+    an - угол, задающий поворот от гоизонтального положения
+    """
     def __init__(self, screen, x2, y2):
         self.screen = screen
         self.surface = surf
@@ -109,6 +123,8 @@ class Gun:
         self.width = 5
 
     def fire2_start(self, event):
+        """ Задает начало выстрела, устанавливая параметр на значение 1
+        """
         self.f2_on = 1
 
     def fire2_end(self, event):
@@ -136,6 +152,10 @@ class Gun:
             self.color = GREEN
 
     def draw1(self, x2, y2):
+        """ Метод рисования пушки, в зависимости от положения мыши
+        Args:
+        x2, y2 - положения конца пушки
+        """
         (x_mouse, y_mouse) = pygame.mouse.get_pos()
         self.x2 = x2
         self.y2 = y2
@@ -153,6 +173,8 @@ class Gun:
                               self.y2 - width_half * math.cos(self.an) - length_up * math.sin(self.an))))
 
     def power_up(self):
+        """Метод зарядки пушки
+        """
         global POWER
         if self.f2_on:
             if self.f2_power < 100:
@@ -164,6 +186,9 @@ class Gun:
 
 
 class Target(Ball):
+    """ Класс, наследуемый от ball
+
+    """
     def __init__(self, screen, x, y, r, vx, vy, color, g):
      super().__init__(screen, x, y, r, vx, vy, color, g)
      self.screen = screen
@@ -181,6 +206,9 @@ class Target(Ball):
             return False
 
     def draw(self):
+        """Нарисовать шарик
+        Метод рисует шарик в координатах x, y
+        """
         pygame.draw.circle(
                 self.screen,
                 self.color,
@@ -189,6 +217,10 @@ class Target(Ball):
             )
 
     def collision(self, obj, p, q):
+        """ Метод столкновения целей между собой
+        p - скорость по x объекта с которым сталкиваются
+        q - скорость по y объекта с которым сталкиваются
+        """
         if (self.x-obj.x)**2 + (self.y-obj.y)**2 <= (self.r + obj.r)**2:
             p = obj.vx
             q = obj.vy
@@ -211,6 +243,10 @@ class Bullet(Ball):
                 self.r
             )
 
+    def delete(self, list):
+        if list[i].vx and list[i].vy == 0:
+            list.pop(i)
+
 
 class Bomb(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color, g):
@@ -224,6 +260,10 @@ class Bomb(Ball):
                 (self.x, self.y),
                 self.r
             )
+
+    #def detonation(self, list):
+        #if list[i].y > 570:
+            #list.pop(i)
 
 
 class Tank(Gun):
@@ -245,22 +285,21 @@ class Tank(Gun):
             self.x += self.vx
 
         elif d == -1:
-             self.x += -self.vx
+            self.x += -self.vx
 
     def hit(self, obj):
-        if obj.x > self.x and obj.x < self.x + 50 and obj.y<570 and obj.y > 550:
+        if obj.x > self.x and obj.x < self.x + 50 and obj.y<570 and obj.y > 520:
             self.health -= 10
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-
-points = 0
+superbombs = []
 
 Targets = []
 for i in range(randint(5, 7)):
-    x = randint(100+100*2*i, 200+100*2*i)
-    y = 100*i
-    r = randint(30, 50)
+    x = randint(0, 600)
+    y = randint(0, 400)
+    r = randint(20, 40)
     vx = randint(-10, 10)
     vy = 0
     COLOR = GAME_COLORS[randint(0, 5)]
@@ -270,7 +309,7 @@ for i in range(randint(5, 7)):
 l = len(Targets)
 bullet = 0
 s = 0
-score = 0
+score1 = score2 = 0
 flag1 = flag2 = False
 Bullets1 = []
 Bullets2 = []
@@ -281,9 +320,24 @@ finished = False
 fla = fld = False
 fl_left = fl_right = False
 Bombs = []
-
+for i in range(l):
+    x = Targets[i].x
+    y = Targets[i].y
+    r = 10
+    vx = 0
+    vy = 10
+    g = 10
+    new_bomb = Bomb(screen, x, y, r, vx, vy, BLACK, g)
+    Bombs.append(new_bomb)
+T = []
+control = 100
+for i in range(l):
+    T.append(0)
 
 while not finished:
+    if T[1] == 101:
+        for i in range(l):
+            T[i] = 0
     s1 = len(Bullets1)
     s2 = len(Bullets2)
     screen.fill(WHITE)
@@ -291,21 +345,34 @@ while not finished:
         Tank.draw(tank2)
     if tank1.health > 0:
         Tank.draw(tank1)
-    for i in range(l):
-        x = Targets[i].x
-        y = Targets[i].y
-        r = 10
-        vx = 0
-        vy = 10
-        g = 10
-        new_bomb = Bullet(screen, x, y, r, vx, vy, BLACK, g)
-        Bombs.append(new_bomb)
+    l1 = len(Bombs)
+    for i in range(l1):
+        if Bombs[i].y > 565:
+            Bombs.pop(i)
+            j = randint(0, l-1)
+            x = Targets[j].x
+            y = Targets[j].y
+            r = 10
+            vx = 0
+            vy = 10
+            g = 10
+            new_bomb = Bomb(screen, x, y, r, vx, vy, BLACK, g)
+            Bombs.append(new_bomb)
+    for i in range(s1):
+        Bullet.delete(Bullets1[i], Bullets1)
 
     f1 = pygame.font.Font(None, 50)
-    text1 = f1.render(str(score), True, (180, 0, 0))
-    text2 = f1.render('score:', True, (180, 0, 0))
-    screen.blit(text1, (120, 50))
+    text1 = f1.render(str(score2), True, (180, 0, 0))
+    text2 = f1.render('score2:', True, (180, 0, 0))
+    screen.blit(text1, (750, 50))
+    screen.blit(text2, (610, 50))
+
+    f2 = pygame.font.Font(None, 50)
+    text1 = f2.render(str(score1), True, (180, 0, 0))
+    text2 = f2.render('score1:', True, (180, 0, 0))
+    screen.blit(text1, (150, 50))
     screen.blit(text2, (10, 50))
+
     x1, y1 = pygame.mouse.get_pos()
     for i in range(l):
         Ball.draw(Targets[i])
@@ -371,7 +438,8 @@ while not finished:
             Tank.move(tank1, 1)
         elif fla == True:
             Tank.move(tank1, -1)
-
+    s1 = len(Bullets1)
+    s2 = len(Bullets2)
     for i in range(s1):
         Bullet.draw(Bullets1[i])
         Bullet.move(Bullets1[i])
@@ -379,15 +447,18 @@ while not finished:
           for j in range(s1):
             if Targets[i].hittest(Bullets1[j]) == True:
                 Targets.pop(i)
-                score += 1
-                x = randint(100 + 100 * 2 * i, 200 + 100 * 2 * i)
-                y = 100*i
-                r = randint(30, 50)
+                score1 += 1
+                x = randint(0, 600)
+                y = randint(0, 400)
+                r = randint(20, 40)
                 vx = randint(-10, 10)
                 vy = 0
                 COLOR = GAME_COLORS[randint(0, 5)]
-                my_ball = Target(screen, x, y, r, vx, vy, COLOR, points)
+                g = 0
+                my_ball = Target(screen, x, y, r, vx, vy, COLOR, g)
                 Targets.append(my_ball)
+    s1 = len(Bullets1)
+    s2 = len(Bullets2)
     for i in range(s2):
         Bullet.draw(Bullets2[i])
         Bullet.move(Bullets2[i])
@@ -395,71 +466,58 @@ while not finished:
            for j in range(s2):
             if Targets[i].hittest(Bullets2[j]) == True:
                 Targets.pop(i)
-                score += 1
-                x = randint(100 + 100 * 2 * i, 200 + 100 * 2 * i)
-                y = 100*i
-                r = randint(30, 50)
+                score2 += 1
+                x = randint(0, 600)
+                y = randint(0, 400)
+                r = randint(20, 40)
                 vx = randint(-10, 10)
                 vy = 0
                 COLOR = GAME_COLORS[randint(0, 5)]
-                my_ball = Target(screen, x, y, r, vx, vy, COLOR, points)
+                g = 0
+                my_ball = Target(screen, x, y, r, vx, vy, COLOR, g)
                 Targets.append(my_ball)
     for i in range(l):
         for j in range(i+1, l, 1):
             Target.collision(Targets[i], Targets[j], 2, 2)
-    for i in range(l):
+    l1 = len(Bombs)
+    for i in range(l1):
         Bombs[i].move()
         Bombs[i].draw()
         if flag1:
             Tank.hit(tank1, Bombs[i])
         if flag2:
             Tank.hit(tank2, Bombs[i])
+
     if flag2:
         Tank.power_up(tank2)
     if flag1:
         Tank.power_up(tank1)
-    for i in range(s1-1):
-        if Bullets1[i].vx == 0:
-            Bullets1.pop(i)
-            s = s-1
-    for i in range(s2-1):
-        if Bullets2[i].vx == 0:
-            Bullets2.pop(i)
-            s = s-1
-    for i in range(l):
-        if Targets[i].vx == 0:
-            Targets.pop(i)
-            x = randint(100, 700)
-            y = randint(100, 500)
-            r = randint(30, 50)
-            vx = randint(-10, 10)
-            vy = 0
-            COLOR = GAME_COLORS[randint(0, 5)]
-            my_ball = Target(screen, x, y, r, vx, vy, COLOR, 0)
-            Targets.append(my_ball)
+    s1 = len(Bullets1)
+    s2 = len(Bullets2)
+    l1 = len(Bombs)
     if flag2:
-        for i in range(l):
+       if l1 > 0:
+        for i in range(l1):
             Tank.hit(tank2, Bombs[i])
     if flag1:
-        for i in range(l):
+       if l1 > 0:
+        for i in range(l1):
             Tank.hit(tank1, Bombs[i])
     if tank1.health > 0:
+       if s2 > 0:
         for i in range(s2):
             Tank.hit(tank1, Bullets2[i])
     if tank2.health > 0:
-        for i in range(s1):
-            Tank.hit(tank2, Bullets1[i])
-            if Bullets1[i].x > tank2.x and Bullets1[i].x < tank2.x + 50 and Bullets1[i].y < 570 and Bullets1[i].y > 550:
-             Bullets1.pop(i)
-             x = Targets[i].x
-             y = Targets[i].y
-             r = 10
-             vx = 0
-             vy = 10
-             g = 10
-             new_bomb = Bullet(screen, x, y, r, vx, vy, BLACK, g)
-             Bombs.append(new_bomb)
+        s1 = len(Bullets1)
+        s2 = len(Bullets2)
+        if s1 > 0:
+            for i in range(s1):
+                Tank.hit(tank2, Bullets1[i])
+                if Bullets1[i].x > tank2.x and Bullets1[i].x < tank2.x + 50 and Bullets1[i].y < 570 and Bullets1[i].y > 520:
+                    control = i
+    if len(Bullets1) > 0:
+        Bullets1.pop(control)
+    print(tank2.health)
     pygame.display.update()
-
     clock.tick(FPS)
 pygame.quit()
