@@ -411,7 +411,6 @@ tank1 = Tank(screen, 300, 20, 100)
 tank2 = Tank(screen, 500, 20, 100)
 finished = False
 fla = fld = False
-fl_left = fl_right = False
 Bombs = []
 for i in range(l):
     x = Targets[i].x
@@ -458,7 +457,7 @@ while not finished:
     write('score2:', score2, 610, 50, 180)
     write('score1:', score1, 10, 50, 180)
     if timer < 100:
-        write('Нажмите 1 или 2 для выбора и переключения', -1, 100, 300, 180)
+        write('Нажмите 1 или 2 для переключения танков', -1, 100, 300, 180)
         write('AD-движение 1, стрелки - движение 2', -1, 100, 340, 180)
         timer += 1
     if tank2.health > 0:
