@@ -411,6 +411,7 @@ tank1 = Tank(screen, 300, 20, 100)
 tank2 = Tank(screen, 500, 20, 100)
 finished = False
 fla = fld = False
+fl_left = fl_right = False
 Bombs = []
 for i in range(l):
     x = Targets[i].x
