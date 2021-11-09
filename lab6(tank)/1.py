@@ -164,7 +164,7 @@ class Gun:
     width - ширина
     an - угол, задающий поворот от гоизонтального положения
     """
-    def __init__(self, screen, x2, y2):
+    def __init__(self, screen, x2, y2, x3, y3):
         self.screen = screen
         self.surface = surf
         self.f2_power = 10
@@ -173,6 +173,8 @@ class Gun:
         self.color = GREEN
         self.x2 = x2
         self.y2 = y2
+        self.x3 = x3
+        self.y3 = y3
         self.length = 30
         self.width = 5
 
@@ -205,15 +207,16 @@ class Gun:
         else:
             self.color = GREEN
 
-    def draw1(self, x2, y2):
+    def draw1(self, x2, y2, x3, y3):
         """ Метод рисования пушки, в зависимости от положения мыши
         Args:
         x2, y2 - положения конца пушки
         """
-        (x_mouse, y_mouse) = pygame.mouse.get_pos()
         self.x2 = x2
         self.y2 = y2
-        self.an = math.atan2((-y_mouse + self.y2), (x_mouse - self.x2))
+        self.x3 = x3
+        self.y3 = y3
+        self.an = math.atan2((-self.y3 + self.y2), (self.x3 - self.x2))
         length_up = self.length + self.f2_power
         width_half = self.width / 2
         pygame.draw.polygon(self.screen, self.color,
@@ -289,6 +292,7 @@ class Bullet(Ball):
     def __init__(self, screen, x, y, r, vx, vy, color, g):
      super().__init__(screen, x, y, r, vx, vy, color, g)
      self.screen = screen
+
     def draw(self):
         pygame.draw.circle(
                 self.screen,
@@ -321,24 +325,27 @@ class Tank(Gun):
     x, y - координаты танка
     vx - скорость по оси x
     """
-    def __init__(self, screen, x, vx, health):
-        super().__init__(self, x, y)
+    def __init__(self, screen, x, y, vx, vy, health, x2, y2, x3, y3):
+        super().__init__(self, x, y, x3, y3)
         self.screen = screen
         self.x = x
         self.y = y
         self.vx = vx
+        self.vy = vy
         self.health = health
+        self.x3 = x3
+        self.y3 = y3
 
     def draw(self):
         """
         Метод рисования танка
 
         """
-        pygame.draw.rect(self.screen, BLACK, (self.x, 550, 50, 20))
-        pygame.draw.rect(self.screen, BLACK, (self.x+10, 520, 30, 30))
-        Tank.draw1(self, self.x + 25, 535)
+        pygame.draw.rect(self.screen, BLACK, (self.x, self.y, 50, 20))
+        pygame.draw.rect(self.screen, BLACK, (self.x+10, self.y-30, 30, 30))
+        Tank.draw1(self, self.x + 25, self.y - 15, self.x3, self.y3)
 
-    def move(self, d):
+    def move(self, d, p):
         """
         Метод перемещения с параметром, отвечающим за напраление
         """
@@ -347,6 +354,12 @@ class Tank(Gun):
 
         elif d == -1:
             self.x += -self.vx
+
+        if p == 1:
+            self.y -= self.vy
+
+        elif p == -1:
+            self.y += self.vy
 
     def hit(self, obj):
         """
@@ -407,11 +420,12 @@ flag1 = flag2 = False
 Bullets1 = []
 Bullets2 = []
 clock = pygame.time.Clock()
-tank1 = Tank(screen, 300, 20, 100)
-tank2 = Tank(screen, 500, 20, 100)
+tank1 = Tank(screen, 300, 570, 20, 20, 100, 0, 0, 0, 0)
+tank2 = Tank(screen, 500, 570, 20, 20, 100, 0, 0, 0, 0)
 finished = False
-fla = fld = False
-fl_left = fl_right = False
+fla = fld = flw = fls = False
+fl_left = False
+fl_right = True
 Bombs = []
 for i in range(l):
     x = Targets[i].x
@@ -422,24 +436,23 @@ for i in range(l):
     g = 10
     new_bomb = Bomb(screen, x, y, r, vx, vy, BLACK, g)
     Bombs.append(new_bomb)
-T = []
 control = 100
-for i in range(l):
-    T.append(0)
 timer = 0
 
 while not finished:
     control1 = control2 = 100
-    if T[1] == 101:
-        for i in range(l):
-            T[i] = 0
     s1 = len(Bullets1)
     s2 = len(Bullets2)
     screen.fill(WHITE)
-    if tank2.health > 0:
-        Tank.draw(tank2)
     if tank1.health > 0:
+        u, w = pygame.mouse.get_pos()
+        tank1.x3 = u
+        tank1.y3 = w
         Tank.draw(tank1)
+    if tank2.health > 0:
+        tank2.x3 = tank1.x
+        tank2.y3 = tank1.y
+        Tank.draw(tank2)
     l1 = len(Bombs)
     for i in range(l1):
         if Bombs[i].y > 565:
@@ -458,8 +471,8 @@ while not finished:
     write('score2:', score2, 610, 50, 180)
     write('score1:', score1, 10, 50, 180)
     if timer < 100:
-        write('Нажмите 1 или 2 для переключения танков', -1, 100, 300, 180)
-        write('AD-движение 1, стрелки - движение 2', -1, 100, 340, 180)
+        write('Нажмите 1 для активации 1 танка', -1, 100, 300, 180)
+        write('WASD-движение 1', -1, 100, 340, 180)
         timer += 1
     if tank2.health > 0:
         write('health2:', tank2.health, 610, 80, 180)
@@ -479,63 +492,65 @@ while not finished:
         if event.type == pygame.QUIT:
             finished = True
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                fl_left = True
-            elif event.key == pygame.K_a:
+            if event.key == pygame.K_a:
                 fla = True
-            elif event.key == pygame.K_RIGHT:
-                fl_right = True
+            elif event.key == pygame.K_w:
+                flw = True
+            elif event.key == pygame.K_s:
+                fls = True
             elif event.key == pygame.K_d:
                 fld = True
         elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
-                fl_left = False
             if event.key == pygame.K_a:
                 fla = False
-            elif event.key == pygame.K_RIGHT:
-                fl_right = False
+            elif event.key == pygame.K_w:
+                flw = False
+            elif event.key == pygame.K_s:
+                fls = False
             elif event.key == pygame.K_d:
                 fld = False
             elif event.key == pygame.K_1:
                 flag1 = True
-                flag2 = False
             elif event.key == pygame.K_2:
                 flag2 = True
-                flag1 = False
         elif event.type == pygame.MOUSEMOTION:
             if flag2:
                 Tank.targetting(tank2, event)
             if flag1:
                 Tank.targetting(tank1, event)
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if flag2:
-                Tank.fire2_start(tank2, event)
-            if flag1:
-                Tank.fire2_start(tank1, event)
-        elif event.type == pygame.MOUSEBUTTONUP:
-          if flag2:
+            Tank.fire2_start(tank2, event)
+            Tank.fire2_start(tank1, event)
+        elif event.type == pygame.MOUSEBUTTONUP:  # второй стреляет когда стреляет первый
             Tank.fire2_end(tank2, event)
             (x_mouse2, y_mouse2) = pygame.mouse.get_pos()
-            angle2 = math.atan2((-y_mouse2 + 535), (x_mouse2 - tank2.x+30))
-            new_ball2 = Bullet(screen, tank2.x+30, 535, 10, POWER/2.5 * math.cos(angle2),  POWER/2.5 * math.sin(angle2), GAME_COLORS[randint(0, 5)], 10)
+            angle2 = math.atan2((-tank1.y + 535), (tank1.x - tank2.x+30))
+            new_ball2 = Bullet(screen, tank2.x+30, 535, 10, 120/2.5 * math.cos(angle2),  120/2.5 * math.sin(angle2), GAME_COLORS[randint(0, 5)], 10)
             Bullets2.append(new_ball2)
-          elif flag1:
             Tank.fire2_end(tank1, event)
             (x_mouse1, y_mouse1) = pygame.mouse.get_pos()
-            angle1 = math.atan2((-y_mouse1 + 535), (x_mouse1 - tank1.x + 30))
-            new_ball1 = Bullet(screen, tank1.x + 30, 535, 10, POWER / 2.5 * math.cos(angle1),
+            angle1 = math.atan2((-y_mouse1 + tank1.y-15), (x_mouse1 - tank1.x + 30))
+            new_ball1 = Bullet(screen, tank1.x + 30, tank1.y-15, 10, POWER / 2.5 * math.cos(angle1),
                                POWER / 2.5 * math.sin(angle1), GAME_COLORS[randint(0, 5)], 10)
             Bullets1.append(new_ball1)
-    if flag2:
-        if fl_right == True:
-            Tank.move(tank2, 1)
-        elif fl_left == True:
-            Tank.move(tank2, -1)
-    if flag1:
-        if fld == True:
-            Tank.move(tank1, 1)
-        elif fla == True:
-            Tank.move(tank1, -1)
+    if fl_right == True:
+        Tank.move(tank2, 1, 0)
+        if tank2.x > 700:
+            fl_right = False
+            fl_left = True
+    elif fl_left == True:
+        Tank.move(tank2, -1, 0)
+        if tank2.x < 50:
+            fl_right = True
+            fl_left = False
+    if fld == True:
+            Tank.move(tank1, 1, 0)
+    elif fla == True:
+            Tank.move(tank1, -1, 0)
+    if flw == True:
+            Tank.move(tank1, 0, 1)
+    elif fls == True:
+            Tank.move(tank1, 0, -1)
     s1 = len(Bullets1)
     s2 = len(Bullets2)
     for i in range(p):
@@ -635,7 +650,7 @@ while not finished:
        if s2 > 0:
         for i in range(s2):
             Tank.hit(tank1, Bullets2[i])
-            if Bullets2[i].x > tank1.x and Bullets2[i].x < tank1.x + 50 and Bullets2[i].y < 570 and Bullets2[i].y > 520:
+            if Bullets2[i].x > tank1.x and Bullets2[i].x < tank1.x + 50 and Bullets2[i].y < tank1.y+10 and Bullets2[i].y > tank1.y-30:
                 control2 = i
     if len(Bullets2) > 0:
         if control2 <= len(Bullets2):
